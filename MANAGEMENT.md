@@ -2,7 +2,8 @@
 
 ## 관리 도구 사용법
 
-`proxyctl`은 실행 중인 프록시 서버를 관리하기 위한 명령줄 도구입니다.
+`proxyctl`은 실행 중인 프록시 서버를 관리하기 위한 C 언어 기반 명령줄 도구입니다.
+Unix Socket을 통해 프록시 서버와 통신하여 실시간 관리 기능을 제공합니다.
 
 ### 기본 사용법
 
@@ -203,24 +204,6 @@ sudo ./bin/proxyctl list
 ```
 
 ## 고급 사용법
-
-### Python 스크립트로 제어
-
-`proxyctl`은 Python 스크립트이므로, 직접 import하여 사용할 수도 있습니다.
-
-```python
-#!/usr/bin/env python3
-import sys
-sys.path.insert(0, '/path/to/proxy-server/bin')
-from proxyctl import send_request, CMD_LIST_CONNECTIONS
-
-# 연결 목록 가져오기
-response = send_request('/tmp/tcp_proxy_control.sock', CMD_LIST_CONNECTIONS)
-
-if response and response['success']:
-    for conn in response['connections']:
-        print(f"PID: {conn['pid']}, Client: {conn['client_addr']}:{conn['client_port']}")
-```
 
 ### 로그와 함께 사용
 
