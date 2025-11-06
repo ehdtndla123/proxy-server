@@ -61,17 +61,20 @@ bool filter_chain_add_throttle(FilterChain *chain, int bytes_per_sec) {
 }
 
 bool filter_apply(FilterChain *chain, const char *data, int length, ConnectionStats *stats) {
+    (void)data;   // 미사용 매개변수 경고 방지
+    (void)stats;  // 미사용 매개변수 경고 방지
+
     if (chain->count == 0) {
         return true;  // 필터 없음, 통과
     }
-    
+
     for (int i = 0; i < chain->count; i++) {
         Filter *filter = &chain->filters[i];
-        
+
         if (!filter->enabled) {
             continue;
         }
-        
+
         switch (filter->type) {
             case FILTER_DELAY: {
                 int delay_ms = filter->params.delay.delay_ms;
@@ -79,20 +82,20 @@ bool filter_apply(FilterChain *chain, const char *data, int length, ConnectionSt
                 usleep(delay_ms * 1000);  // ms to microseconds
                 break;
             }
-            
+
             case FILTER_DROP: {
                 float drop_rate = filter->params.drop.drop_rate;
                 float random = (float)rand() / RAND_MAX;
-                
+
                 if (random < drop_rate) {
-                    LOG_WARN("패킷 드롭 (확률: %.2f%%, 랜덤: %.2f)", 
+                    LOG_WARN("패킷 드롭 (확률: %.2f%%, 랜덤: %.2f)",
                              drop_rate * 100, random * 100);
-                    stats->packets_dropped++;
+                    // 드롭 카운팅은 proxy.c에서 수행
                     return false;  // 패킷 드롭
                 }
                 break;
             }
-            
+
             case FILTER_THROTTLE: {
                 int bytes_per_sec = filter->params.throttle.bytes_per_sec;
                 int delay_us = (length * 1000000) / bytes_per_sec;
@@ -100,12 +103,12 @@ bool filter_apply(FilterChain *chain, const char *data, int length, ConnectionSt
                 usleep(delay_us);
                 break;
             }
-            
+
             default:
                 break;
         }
     }
-    
+
     return true;  // 통과
 }
 

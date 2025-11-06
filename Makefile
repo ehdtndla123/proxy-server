@@ -28,6 +28,7 @@ directories:
 $(TARGET): $(OBJECTS)
 	@echo "링킹: $@"
 	@$(CC) $(OBJECTS) -o $@ $(LDFLAGS)
+	@chmod +x $(BIN_DIR)/proxyctl 2>/dev/null || true
 	@echo "빌드 완료: $@"
 
 # 오브젝트 파일 생성
