@@ -6,13 +6,17 @@
 
 void config_init(ProxyConfig *config) {
     memset(config, 0, sizeof(ProxyConfig));
-    
+
     // 기본값 설정
     config->listen_port = 9999;
-    strcpy(config->target_host, "127.0.0.1");
+    strncpy(config->target_host, "127.0.0.1", MAX_HOST_LEN - 1);
+    config->target_host[MAX_HOST_LEN - 1] = '\0';
     config->target_port = 8080;
     config->enable_logging = true;
-    strcpy(config->log_file, "logs/proxy.log");
+    strncpy(config->log_file, "logs/proxy.log", MAX_PATH_LEN - 1);
+    config->log_file[MAX_PATH_LEN - 1] = '\0';
+    strncpy(config->control_socket, "/tmp/tcp_proxy_control.sock", MAX_PATH_LEN - 1);
+    config->control_socket[MAX_PATH_LEN - 1] = '\0';
     config->enable_filters = false;
 }
 
