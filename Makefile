@@ -10,13 +10,18 @@ INC_DIR = include
 BUILD_DIR = build
 BIN_DIR = bin
 
-# 소스 파일
-SOURCES = $(wildcard $(SRC_DIR)/*.c)
-OBJECTS = $(SOURCES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
-TARGET = $(BIN_DIR)/tcp_proxy
+# tcp_proxy 소스 파일 (proxyctl.c 제외)
+PROXY_SOURCES = $(filter-out $(SRC_DIR)/proxyctl.c, $(wildcard $(SRC_DIR)/*.c))
+PROXY_OBJECTS = $(PROXY_SOURCES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
+PROXY_TARGET = $(BIN_DIR)/tcp_proxy
+
+# proxyctl 소스 파일
+PROXYCTL_SOURCES = $(SRC_DIR)/proxyctl.c
+PROXYCTL_OBJECTS = $(BUILD_DIR)/proxyctl.o
+PROXYCTL_TARGET = $(BIN_DIR)/proxyctl
 
 # 기본 타겟
-all: directories $(TARGET)
+all: directories $(PROXY_TARGET) $(PROXYCTL_TARGET)
 
 # 디렉토리 생성
 directories:
@@ -24,11 +29,16 @@ directories:
 	@mkdir -p $(BIN_DIR)
 	@mkdir -p logs
 
-# 실행 파일 생성
-$(TARGET): $(OBJECTS)
+# tcp_proxy 실행 파일 생성
+$(PROXY_TARGET): $(PROXY_OBJECTS)
 	@echo "링킹: $@"
-	@$(CC) $(OBJECTS) -o $@ $(LDFLAGS)
-	@chmod +x $(BIN_DIR)/proxyctl 2>/dev/null || true
+	@$(CC) $(PROXY_OBJECTS) -o $@ $(LDFLAGS)
+	@echo "빌드 완료: $@"
+
+# proxyctl 실행 파일 생성
+$(PROXYCTL_TARGET): $(PROXYCTL_OBJECTS)
+	@echo "링킹: $@"
+	@$(CC) $(PROXYCTL_OBJECTS) -o $@ $(LDFLAGS)
 	@echo "빌드 완료: $@"
 
 # 오브젝트 파일 생성
@@ -49,18 +59,20 @@ rebuild: clean all
 # 설치
 install: all
 	@echo "설치 중..."
-	@cp $(TARGET) /usr/local/bin/
-	@echo "설치 완료: /usr/local/bin/tcp_proxy"
+	@cp $(PROXY_TARGET) /usr/local/bin/
+	@cp $(PROXYCTL_TARGET) /usr/local/bin/
+	@echo "설치 완료: /usr/local/bin/tcp_proxy, /usr/local/bin/proxyctl"
 
 # 제거
 uninstall:
 	@echo "제거 중..."
 	@rm -f /usr/local/bin/tcp_proxy
+	@rm -f /usr/local/bin/proxyctl
 	@echo "제거 완료"
 
 # 실행
 run: all
-	@$(TARGET)
+	@$(PROXY_TARGET)
 
 # 도움말
 help:
