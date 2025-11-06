@@ -1,0 +1,28 @@
+# 빌드 아티팩트
+build/
+bin/tcp_proxy
+
+# 로그 파일
+logs/*.log
+
+# 제어 소켓
+/tmp/tcp_proxy_control.sock
+
+# 오브젝트 파일
+*.o
+*.a
+*.so
+
+# 실행 파일
+tcp_proxy
+
+# 에디터 관련
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# OS 관련
+.DS_Store
+Thumbs.db
